@@ -1,0 +1,114 @@
+<html>
+<head>
+<title>Substance Samples - Cookbook polish</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<h1>Polishing the visuals</h1>
+
+<h3>Lather, rinse, repeat</h3>
+
+<p>Unless you are using the exact same images that the designer was using
+for creating the screen mockups, the process of implementing the required visuals
+is hardly ever done. The slightest variations in color saturation, hues and brightness
+can result in a drab appearance. Not paying attention to artfully placed 
+visual separators (gaps, margins, borders) can result in a cluttered appearance.
+Failing to remove visual noise that does not bother you as a programmer
+can result in visual distractions for the users, even at the unconscious
+level.</p>
+
+<p>Here is a screenshot of the very first implementation of Cookbook UI header
+before all the visual tweaks introduced in the previous phases:</p>
+
+<img src="../../images/cookbook/05-polish/first-pass-substance-header.png" width=369 height=61>
+
+<p>and here is the current implementation:</p>
+
+<img src="../../images/cookbook/05-polish/current-pass-substance-header.png" width=369 height=61>
+
+<p>Here is a screenshot of the first implementation of Cookbook UI footer:</p>
+
+<img src="../../images/cookbook/05-polish/first-pass-substance-footer.png" width=186 height=29>
+
+<p>and here is the current implementation:</p>
+
+<img src="../../images/cookbook/05-polish/current-pass-substance-footer.png" width=230 height=32>
+
+<h3>The devil is in the details</h3>
+
+<p>While the first two phases (<a href="01-analysis.html">analysis</a> and 
+<a href="02-mapping.html">mapping</a>) operated on more abstract layers
+(decoration areas, functional areas, container hierarchy), the implementation
+phases (<a href="03-decoration.html">decoration</a> and 
+<a href=04-skin.html">skin creation</a>) must pay painstaking attention to all the
+minute details of the target design. Not closely following the design may seem
+insignificant to the developer, but it will in most cases result in deteriorated
+user experience.</p>
+
+<p>The following is an incomplete list of Cookbook UI minute visuals that have
+been pointed out before. Most of these can be easily addressed with Substance
+<a href="https://substance.dev.java.net/docs/painters/overview.html">painters</a>
+and 
+<a href="https://substance.dev.java.net/docs/skins/overview.html">skins</a>.</p>
+
+<ul>
+  <li>Seamless and continuous texturing of header, footer and sidebar areas.</li>
+  <li>Light-dark fill gradients for the buttons.</li>
+  <li>Darker gradients for the button borders with translucent fading inner
+  borders.</li>
+  <li>Color schemes used for the selected buttons in the header and scroll bar in
+  the sidebar.</li>
+</ul>
+
+<p>Here are two more examples of fine details that are easily missed at a cursory
+glance. The following is a zoomed screenshot of the seam between the sidebar and
+the footer area. The vertical separator has two lines, darker on the left and
+lighter on the right. The same appies to the horizontal separator. In addition, the
+horizontal separator is painted on top of the vertical one to further enforce
+the boundary between the application functional areas:</p>
+
+<img src="../../images/cookbook/05-polish/zoom-footer-cookbook.png" width=414 height=187>
+
+<p>In the implementation, the vertical separators are painted as a custom border
+installed on the relevant panels. While this can be achieved with the decoration 
+painter, in this specific case it is easier to use borders and supported
+Substance APIs (to fetch the color schemes). These borders are the only usage of
+Substance APIs outside the self-contained definition of the custom skin. This is 
+an example of the tradeoff between containing the painting routines inside the
+skin definition and the limitations of the Substance skinning layer that impose
+greater complexity on implementing this specific feature.</p>
+
+<p>The next screenshot shows a zoomed version of the buttons in one of the footers:</p>
+
+<img src="../../images/cookbook/05-polish/zoom-buttons-cookbook.png" width=397 height=107>
+
+<p>In addition to the details on the gradient fill and the double border, there is 
+one more important thing - the seamless appearance of the buttons as one joined
+group. In order to implement this, i am using the 
+<code><font color="darkblue">org.jvnet.flamingo.common.JCommandButtonStrip</font></code>
+component from <a href="https://flamingo.dev.java.net">Flamingo</a> component suite
+with the matching <a href="https://substance-flamingo.dev.java.net">Substance plugin</a>.
+Buttons placed in the <code><font color="darkblue">JCommandButtonStrip</font></code>
+will have continuous background, a single separator line between them and correct rounded
+corners on the left / right buttons.</p>
+
+<p>Using Flamingo also facilitates creation of custom icons for the header and footer
+buttons. In this case, i am using the offline Flamingo 
+<a href="http://www.pushing-pixels.org/?p=424">SVG transcoder</a> to transcode
+a few icons from the <a href="http://tango.freedesktop.org/Tango_Icon_Gallery">Tango
+iconset</a> to pure Java2D based classes. A combination of a few 
+<a href="http://www.jhlabs.com/ip/filters/index.html">filters</a> can make these
+icons white with a darker halo shade.</p>
+
+<h3>Even when you think you're done</h3>
+
+<p>The process of defining, implementing and refining the visuals can take
+a few iterations until both sides (design and implementation) are satisfied with
+the results. In this process, paying attention to the work of the designer is as
+important as handling all the corner cases in the business logic. Indeed, a few 
+ill-advised pixels or a drab color scheme are not going to bring your application down.
+However, if you are interested in providing an appealing and immersive flow to
+your users, it is most certainly worth extra few days of investment.</p>
+
+</body>
+</html>

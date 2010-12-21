@@ -1,0 +1,217 @@
+<html>
+<head>
+<title>Substance Samples - Cookbook decorations</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<h1>Implementing the decoration painting</h1>
+
+<h3>Overview of the application and Substance decoration areas</h3>
+
+<p>In the <a href="01-analysis.html">first step</a> we have identified the
+decoration areas of Cookbook UI, and in the <a href="02-mapping.html">second step</a>
+we mapped these areas to Substance decoration areas. The screenshot below shows the
+application decoration areas:</p>
+
+<img src="../../images/cookbook/01-analysis/decoration-all.png" width=500 height=267>
+
+<p>And the screenshot below shows an overlay of the Swing container
+hierarchy and the tagging of relevant containers associating them with the
+matching Substance decoration areas:</p>
+
+<img src="../../images/cookbook/02-mapping/hierarchy-all.png" width=500 height=267>
+
+<p>It is now time to implement the visuals of Cookbook decoration areas.</p>
+
+<h3>Fidelity to the original design</h3>
+
+<p>During the implementation stage you should strive to be as close as
+possible to the original design. While sometimes the technical limitations of the
+specific UI toolkit / library may prevent achieving the exact visuals and
+dynamic behavior as designed, you as the developer should not decide to 
+change the design without providing feedback to the design team and
+waiting for the reworked visuals to implement.</p>
+
+<p>As far as the implementation is concerned, a valid and in most cases
+simpler option would be to work on the image level. Most probably the design
+team uses a tool that allows compositing multiple layers into the final
+files that they are passing to the development. Those layers that represent
+decoration textures can be used directly to provide high-fidelity 
+implementation. There is a number of important points to remember if you decide
+to go this route:</p>
+
+<ul>
+  <li>Target user machines can have different monitor sizes, and some
+  environments may be multi-monitor setups. The images need to be big
+  enough to accomodate dynamically resizable UIs that can sometimes
+  span multiple monitors.</li>
+  <li>If you decide to use a smaller size image and replicate (tile) it
+  to cover the entire span of the relevant area, make sure that the
+  image edges provide seamless appearance when placed in succession.
+  Even the smallest discrepancy will unconsciously bother the users and
+  degrade the user experience.</li>
+  <li>You need to decide on the anchor point. Is it the top-left corner
+  of the monitor, or the top-left corner of the application window? Some
+  UI toolkits (such as Swing) may employ drawing optimization techniques
+  that can result in image shearing on partial redrawing.</li>
+</ul>
+
+<p>Another option is to implement the target design programmatically.
+While it is harder to achieve the exact visuals using pure code (even
+with such an advanced API as Java2D), this approach may be suitable for
+the programmers who are at ease with the APIs presented by the relevant
+layers. While the exact visuals will be most probably impossible to achieve,
+with the right amount of tweaking and feedback from the designers it
+is possible to arrive at a solution that satisfies <strong>both</strong>
+sides.</p>
+
+<h3>Implementing Substance decorations</h3>
+
+<p>To show my appreciation of the power of Java2D (and as a programmer
+myself), this specific implementation is going to use pure code to 
+achieve visuals that are significantly close to the target UI. To
+speed up the development process i'm going to use the excellent 
+<a href="http://www.jhlabs.com/ip/filters/index.html">collection of 
+filters</a> available from Jerry Huxtable under the Apache 2.0 license.</p>
+
+<p>The header and the footer portions of the Cookbook UI use a texture that
+looks like a cross between brushed metal and wood. To implement this
+texture, i'm using a combination of 
+<code><font color="darkblue">BrushedMetalFilter</font></code> and 
+<code><font color="darkblue">LookupFilter</font></code> to create a brushed
+texture that is mapped to the colors of the relevant 
+<a href="https://substance.dev.java.net/docs/skins/colorschemes.html">Substance 
+color scheme</a> (more on the color scheme selection in the next phase).</p>
+
+<p>Here is the texture image that is going to be painted on top of the gradient fill:</p>
+
+<img src="../../images/cookbook/03-decorations/texture-brushed.png" width=150 height=100>
+
+<p>The screenshot on the left shows a portion of Cookbook UI header area,
+and right next to it is its implementation with a custom Substance decoration painter 
+based on the above filters:</p>
+
+<img src="../../images/cookbook/03-decorations/header-cookbook.png" width=103 height=62>
+<img src="../../images/cookbook/03-decorations/header-substance.png" width=103 height=62>
+
+<p>The screenshot on the left shows a portion of Cookbook UI footer area,
+and right next to it is its implementation with a custom Substance decoration painter 
+based on the above filters:</p>
+
+<img src="../../images/cookbook/03-decorations/footer-cookbook.png" width=106 height=31>
+<img src="../../images/cookbook/03-decorations/footer-substance.png" width=106 height=31>
+
+<p>The sidebar of the Cookbook UI uses a fine-wood texture. To implement this
+texture, i'm using a combination of 
+<code><font color="darkblue">WoodFilter</font></code> and 
+<code><font color="darkblue">LookupFilter</font></code> to create a wood
+texture that is mapped to the colors of the relevant Substance 
+color scheme.</p>
+
+<p>Here is the texture image that is going to be painted on top of the gradient fill:</p>
+
+<img src="../../images/cookbook/03-decorations/texture-wood.png" width=150 height=100>
+
+<p>The screenshot on the left shows a portion of Cookbook UI header area,
+and right next to it is its implementation with a custom Substance decoration painter 
+based on the above filters:</p>
+
+<img src="../../images/cookbook/03-decorations/sidebar-cookbook.png" width=192 height=78>
+<img src="../../images/cookbook/03-decorations/sidebar-substance.png" width=192 height=78>
+
+<h3>Positioning and sizing the generated textures</h3>
+
+<p>As mentioned in the <a href="02-mapping.html">mapping step</a>, the implementation must
+not expose the discrepancy between application and implementation areas. In our case, the
+sidebar spans two adjacent panels, and the footer spans three panels that don't even have
+the same immediate parent. It is absolutely critical not to let these details escape
+into the UI visuals. The visuals presented to the user must be seamless as though painted
+in the same step.</p>
+
+<p>Considerations when using images are applicable for the pure Java2D implementation.
+If you're going to tile smaller images, you need to make sure that the edges
+are seamless. If you're going to create one big image, you need to query the 
+toolkit and compute the combined bounds of all monitors (in this aspect it is 
+easier to go pure-Java2D route than use images). Last, you need to anchor the 
+images so that partial rendering does not result in sheared tiling.</p>
+
+<p>The specific implementation uses APIs available on
+<code><font color="darkblue">GraphicsEnvironment</font></code>,
+<code><font color="darkblue">GraphicsDevice</font></code>,
+<code><font color="darkblue">GraphicsConfiguration</font></code> to query
+the monitor configuration and compute the combined bounds of all
+monitors. The images created using filters thus cover the entire screen setup.
+There are two disadvantages of doing so - longer computation time and
+higher memory footprint. On the other hand, we do not need to worry about 
+tile edges. Also, large areas will be painted in one Java2D call, as opposed
+to possibly multiple renderings of different areas of a smaller tile. 
+Last, the anchoring is done to the top-left corner of the application
+window.</p>
+
+<p>When the specific panel needs to be painted, we compute the offsets to
+the top-left corner of the application window. These offsets are then used to 
+compute the area of the texture image to be painted on the panel. This 
+ensures that even though the "perceived" (application) decoration area is 
+implemented by multiple containers / components, the appearance is seamless 
+and continuous.</p>
+
+<h3>Implementing the lights</h3>
+
+<p>The "light bar" of Cookbook UI proved to be the most challenging
+of the visuals. While it can be considered a tiled texture, it is 
+explicitly anchored to a specific point in the window (the bottom-left
+corner of the light holder). While other textures (header, footbar) 
+can be arbitrarily anchored (as long as all relevant areas use the
+same anchor point), this assumption does not hold here.</p>
+
+<p>In addition, remember that the application sidebar is implemented as
+two separate Swing panels that do not share the same immediate parent.
+This is due to the functional restrictions detailed in the 
+<a href="01-analysis.html">first step</a>. If we mark each one of these
+panels as <code><font color="darkblue">GENERAL</font></code>,
+we're going to store an explicit reference to the top part of the sidebar
+(the light holder) in our decoration painter. This is not desirable 
+since it creates an explicit dependency between the skin and the application,
+which may prove problematic if we want to reuse this skin in other
+portfolio applications.</p>
+
+<p>The solution presented in the <a href="02-mapping.html">second step</a>
+is to mark the center panel of the sidebar container as 
+<code><font color="darkblue">GENERAL</font></code>,
+and mark the inner footer panels as <code><font color="darkblue">FOOTER</font></code>.
+As the parent decoration area type is propagated to all children that
+do not define their own type, the sidebar panels are painted with 
+<code><font color="darkblue">GENERAL</font></code> type. When the specific sidebar 
+panel is painted, we compute the offsets to the farthest container parent that 
+is decorated with <code><font color="darkblue">GENERAL</font></code>. These
+offsets will effectively hold the distance to the bottom-left corner of the
+custom component that implements the light holder visuals (more on this
+in the next step).</p>
+
+<p>Having these offsets in hand we can start tiling an image of a single
+light until we cover the entire width of the currently painted panel.
+This ensures that even though the sidebar application decoration area is implemented by
+multiple containers / components, the appearance of the light bar
+is seamless and continuous.</p>
+
+<p>It might be easier to ask the designers to provide a single translucent
+image of a light bulb with the matching diffused light cone. The
+present implementation imitates this with a blurred mushroom shape
+with a translucent gradient applied to it. However, my recommendation
+would be to use an image-based approach for such fine visuals as this.</p>
+
+<p>Here is the result of Java2D-based implementation of a single light:</p>
+
+<img src="../../images/cookbook/03-decorations/texture-light.png" width=100 height=50>
+
+<p>The next screenshot shows the light bar area of the Cookbook UI:</p>
+
+<img src="../../images/cookbook/03-decorations/lights-cookbook.png" width=416 height=27>
+
+<p>And the Java2D-based implementation which is not as close as the 
+other visuals presented in this step:</p>
+
+<img src="../../images/cookbook/03-decorations/lights-substance.png" width=416 height=27>
+
+</body>
+</html>

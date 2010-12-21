@@ -1,0 +1,65 @@
+<html>
+<head>
+<title>Substance Samples - Cookbook analysis</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<h1>Analyzing the original design</h1>
+
+<h3>Identifying application decoration areas</h3>
+
+<p>The first step in implementing a specific UI in Substance is identifying
+the application <strong>decoration areas</strong>. Here is a thumbnail of the main 
+Cookbook design:</p>
+
+<img src="../../images/cookbook/01-analysis/full.png" width=500 height=267>
+
+<p>This screen has four main decoration areas. The following screenshots
+show a translucent light blue overlay to highlight each one of the areas.</p>
+
+<p>The top portion of the application window is the <strong>header</strong>:</p>
+
+<img src="../../images/cookbook/01-analysis/decoration-header.png" width=500 height=267>
+
+<p>The bottom portion of the application window is the <strong>footer</strong>:</p>
+
+<img src="../../images/cookbook/01-analysis/decoration-footer.png" width=500 height=267>
+
+<p>The left portion of the application window is the <strong>sidebar</strong>:</p>
+
+<img src="../../images/cookbook/01-analysis/decoration-sidebar.png" width=500 height=267>
+
+<p>The center-right portion of the application window is the <strong>main</strong>:</p>
+
+<img src="../../images/cookbook/01-analysis/decoration-main.png" width=500 height=267>
+
+<h3>Identifying application functional areas</h3>
+
+<p>Unlike the decoration areas that are primarily delineated by similar
+colors and textures, the <strong>functional areas</strong> are delineated
+primarily by the user-facing business logic. In Cookbook UI there are three
+main functional areas (in addition to the general control area in the header):</p>
+
+<img src="../../images/cookbook/01-analysis/functional-all.png" width=500 height=267>
+
+<p>Note how the functional areas and decoration areas are not identical. In fact,
+every functional area intersects two decoration areas (and vice versa in most cases).
+Here is the sidebar area in Cookbook UI:</p>
+
+<img src="../../images/cookbook/01-analysis/cookbook-sidebar.png" width=272 height=340>
+
+<p>Note that while the lists and footers have different visuals (colors, textures, 
+gradients), they belong to the same functional group. For example, the footer controls
+for the category list are located directly beneath it, and the footer panel itself
+has the same width as the category list. This is especially true for dynamic scenarios
+when the entire UI is resized or re-proportioned.</p>
+
+<p>This step may cross the line between the pure design and the implementation
+(Swing or other UI toolkits). As the developer, you will mostly be operating on the 
+functional UI areas. It is important to understand that Substance supports the notion
+of different decoration and functional areas. However, in some cases the certain 
+limitations of the Substance decoration layer will impose some restrictions on the way
+you structure the Swing hierarchy.</p>
+
+</body>
+</html>
