@@ -18,7 +18,7 @@
 	<!-- JDK definitions -->
 
 	<path id="jdk.classpath">
-		<fileset dir="${jdk.home}">
+		<fileset dir="${java.home}">
 			<include name="jre/lib/charsets.jar" />
 			<include name="jre/lib/deploy.jar" />
 			<include name="jre/lib/javaws.jar" />
@@ -33,7 +33,7 @@
 		</fileset>
 	</path>
 
-	<property name="project.jdk.home" value="${jdk.home}" />
+	<property name="project.jdk.home" value="${java.home}" />
 	<property name="project.jdk.classpath" value="jdk.classpath" />
 	<!-- Project Libraries -->
 	<!-- Global Libraries -->
@@ -48,7 +48,17 @@
 	<property name="substance-samples.output.dir" value="${substance-samples.build.dir}/classes" />
 	<property name="substance-samples.drop.dir" value="${module.substance-samples.basedir}/drop" />
 	<property name="substance-samples.src.dir" value="${module.substance-samples.basedir}/src/" />
-	<property name="substance.version" value="6.1RC Trinidad" />
+	
+    <property name="substance.basedir" value="${module.substance-samples.basedir}/../substance" />
+    <property name="flamingo.basedir" value="${module.substance-samples.basedir}/../flamingo" />
+    <property name="substance.swingx.basedir" value="${module.substance-samples.basedir}/../substance-swingx" />
+    <property name="substance.flamingo.basedir" value="${module.substance-samples.basedir}/../substance-flamingo" />
+    <property name="substance.demo.basedir" value="${module.substance-samples.basedir}/../substance-demo" />
+    <property name="trident.basedir" value="${module.substance-samples.basedir}/../trident" />
+
+    <property name="substance.version" value="8.0.00-dev" />
+    <property name="flamingo.version" value="6.0.00-dev" />
+    <property name="trident.version" value="1.5.00-dev" />
 
 	<path id="substance-samples.module.bootclasspath">
 		<!-- Paths to be included in compilation bootclasspath -->
@@ -59,12 +69,16 @@
 
 	<path id="substance-samples.module.classpath">
 		<path refid="${module.jdk.classpath.substance-samples}" />
-        <pathelement location="${module.substance-samples.basedir}/../substance/drop/substance.jar"/>
-        <pathelement location="${module.substance-samples.basedir}/../substance/drop/substance-tst.jar"/>
-        <pathelement location="${module.substance-samples.basedir}/../substance/drop/substance-tools.jar"/>
-        <pathelement location="${module.substance-samples.basedir}/../substance/lib/forms-1.2.0.jar"/>
-        <pathelement location="${module.substance-samples.basedir}/../flamingo/drop/flamingo.jar"/>
         <pathelement location="${module.substance-samples.basedir}/lib/filters.jar"/>
+        <pathelement location="${trident.basedir}/drop/${trident.version}/trident-${trident.version}.jar" />
+        <pathelement location="${substance.demo.basedir}/lib/build/jgoodies-forms-1.8.0.jar" />
+        <pathelement location="${substance.demo.basedir}/lib/build/jgoodies-common-1.8.1.jar" />
+        <pathelement location="${substance.basedir}/drop/${substance.version}/substance-${substance.version}.jar" />
+        <pathelement location="${flamingo.basedir}/drop/${flamingo.version}/flamingo-${flamingo.version}.jar" />
+        <pathelement location="${substance.flamingo.basedir}/drop/${substance.version}/substance-flamingo-${substance.version}.jar" />
+        <pathelement location="${substance.swingx.basedir}/drop/${substance.version}/substance-swingx-${substance.version}.jar" />
+        <pathelement location="${substance.demo.basedir}/drop/${substance.version}/substance-demo-${substance.version}.jar" />
+        <pathelement location="${substance.swingx.basedir}/lib/swingx-all-1.6.4.jar" />
 	</path>
 
 	<patternset id="excluded.from.module.substance-samples" />
@@ -74,26 +88,25 @@
 		<patternset refid="javac.excluded" />
 	</patternset>
 
-	<path id="substance-samples.module.testsourcepath">
+	<path id="substance-samples.module.sourcepath">
 		<dirset dir="${substance-samples.src.dir}">
-            <include name="test" />
-            <include name="docrobot" />
+            <include name="org/pushingpixels/samples/substance" />
 		</dirset>
 	</path>
 
-	<target name="compile.module.substance-samples" depends="compile.module.substance-samples.tests" description="compile module substance-samples" />
+	<target name="compile.module.substance-samples" depends="compile.module.substance-samples.production" description="compile module substance-samples" />
 
-	<target name="compile.module.substance-samples.tests"  description="compile module substance-samples test classes" unless="skip.tests">
+	<target name="compile.module.substance-samples.production"  description="compile module substance-samples production classes">
 		<mkdir dir="${substance-samples.output.dir}" />
-		<javac source="${javac.source}" target="${javac.target}" encoding="${javac.encoding}" destdir="${substance-samples.output.dir}" debug="${javac.debug}" nowarn="${javac.generate.no.warnings}" memoryMaximumSize="${javac.max.memory}" fork="true" executable="${module.jdk.home.substance-samples}/bin/javac">
+		<javac source="${javac.source}" target="${javac.target}" encoding="${javac.encoding}" destdir="${substance-samples.output.dir}" debug="${javac.debug}" nowarn="${javac.generate.no.warnings}" memoryMaximumSize="${javac.max.memory}" fork="true">
 			<compilerarg line="${javac.args.substance-samples}" />
 			<bootclasspath refid="substance-samples.module.bootclasspath" />
 			<classpath refid="substance-samples.module.classpath" />
-			<src refid="substance-samples.module.testsourcepath" />
+			<src refid="substance-samples.module.sourcepath" />
 			<patternset refid="excluded.from.compilation.substance-samples" />
 		</javac>
-		<copy todir="${substance-samples.output.dir}/test">
-			<fileset dir="${substance-samples.src.dir}/test">
+		<copy todir="${substance-samples.output.dir}">
+			<fileset dir="${substance-samples.src.dir}">
 				<patternset refid="javac.resources" />
 				<type type="file" />
 				<patternset refid="excluded.from.compilation.substance-samples" />
@@ -109,18 +122,16 @@
 		<!-- Perform any build initialization in this target -->
 	</target>
 
-	<target name="jar-bin-tst" description="create test runtime jar">
-		<mkdir dir="${substance-samples.drop.dir}"/>
-		<delete file="${substance-samples.drop.dir}/substance-samples-tst.jar" />
-		<jar destfile="${substance-samples.drop.dir}/substance-samples-tst.jar">
-			<fileset dir="${substance-samples.output.dir}/" includes="test/**/*.class, test/**/*.colorschemes" />
-            <fileset dir="${substance-samples.src.dir}/" includes="test/resource/**" />
+	<target name="jar-bin" description="create runtime jar">
+		<mkdir dir="${substance-samples.drop.dir}/${substance.version}"/>
+		<delete file="${substance-samples.drop.dir}/${substance.version}/substance-samples-${substance.version}.jar" />
+		<jar destfile="${substance-samples.drop.dir}/${substance.version}/substance-samples-${substance.version}.jar">
+			<fileset dir="${substance-samples.output.dir}/" />
 			<manifest>
 				<attribute name="Substance-Version" value="${substance.version}" />
 				<attribute name="Substance-Samples-BuildStamp" value="${build.time}" />
 			</manifest>
 		</jar>
-		<copy file="${substance-samples.drop.dir}/substance-samples-tst.jar" todir="${module.substance-samples.basedir}/www/webstart" />
 	</target>
 
 	<target name="timestamp">
@@ -148,7 +159,7 @@
 		</zip>
 	</target>
 
-	<target name="jar" depends="jar-bin-tst" description="create all jars" />
+	<target name="jar" depends="jar-bin" description="create all jars" />
 
 	<target name="clean" depends="clean.module.substance-samples" description="cleanup all" />
 
