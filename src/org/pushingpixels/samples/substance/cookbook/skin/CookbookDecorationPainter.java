@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2010 Substance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2018 Substance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,7 +43,6 @@ import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.SwingUtilities;
@@ -172,24 +171,6 @@ class CookbookDecorationPainter implements SubstanceDecorationPainter {
         graphics.setComposite(AlphaComposite.SrcOver.derive(0.25f));
         graphics.drawImage(toOverlay, 0, 0, width, height, dx, dy, dx + width, dy + height, null);
         graphics.setComposite(AlphaComposite.SrcOver);
-
-        if (decorationAreaType == DecorationAreaType.FOOTER) {
-            // special case - draw lines on top
-            int offset = comp.getLocationOnScreen().y
-                    - farthestOfTheSameAreaType.getLocationOnScreen().y;
-
-            float borderStrokeWidth = 1.0f / (float) SubstanceCortex.GlobalScope.getScaleFactor();
-            graphics.setStroke(new BasicStroke(borderStrokeWidth));
-
-            Line2D.Float topLine = new Line2D.Float(0, borderStrokeWidth - offset, width,
-                    borderStrokeWidth - offset);
-            graphics.setColor(fillScheme.getExtraLightColor());
-            graphics.draw(topLine);
-
-            Line2D.Float bottomLine = new Line2D.Float(0, -offset, width, -offset);
-            graphics.setColor(fillScheme.getDarkColor());
-            graphics.draw(bottomLine);
-        }
 
         if (decorationAreaType == DecorationAreaType.GENERAL) {
             // special case - draw lights

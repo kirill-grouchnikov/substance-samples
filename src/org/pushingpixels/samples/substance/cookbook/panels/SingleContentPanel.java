@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2010 Substance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2018 Substance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,92 +33,111 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 
 import javax.swing.Box;
 import javax.swing.JPanel;
 
+import org.pushingpixels.samples.substance.cookbook.CookbookFrame;
 import org.pushingpixels.substance.api.SubstanceCortex;
 import org.pushingpixels.substance.api.SubstanceSlices.DecorationAreaType;
 
 /**
- * This class makes sure that the three application panels have the
- * continuously-looking footer bar at the bottom. The custom layout manager
- * handles the height consistency.
+ * This class makes sure that the three application panels have the continuously-looking footer bar
+ * at the bottom. The custom layout manager handles the height consistency.
  * 
  * @author Kirill Grouchnikov
  */
 public class SingleContentPanel extends JPanel {
-	protected JPanel mainPanel;
+    protected JPanel titlePanel;
 
-	protected JPanel footerContentPanel;
+    protected JPanel mainPanel;
 
-	private JPanel footerPanel;
+    protected JPanel footerContentPanel;
 
-	public SingleContentPanel() {
-		this.mainPanel = new JPanel();
-		this.footerContentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    private JPanel footerPanel;
 
-		footerPanel = new JPanel(new BorderLayout(1, 1));
-		footerPanel.add(Box.createHorizontalStrut(5), BorderLayout.EAST);
-		footerPanel.add(this.footerContentPanel, BorderLayout.CENTER);
-		footerPanel.add(Box.createHorizontalStrut(5), BorderLayout.WEST);
+    private int mainPanelTopOffset;
 
-		this.setLayout(new ContentPanelLayoutManager());
-		this.add(this.mainPanel);
-		this.add(footerPanel);
+    public SingleContentPanel(int mainPanelTopOffset) {
+        this.titlePanel = new JPanel();
+        this.mainPanel = new JPanel();
+        this.footerContentPanel = new JPanel(new BorderLayout());
 
-		SubstanceCortex.ComponentScope.setDecorationType(this.footerPanel,
-				DecorationAreaType.FOOTER);
-	}
+        this.footerPanel = new JPanel(new BorderLayout(1, 1));
+        this.footerPanel.add(Box.createHorizontalStrut(5), BorderLayout.EAST);
+        this.footerPanel.add(this.footerContentPanel, BorderLayout.CENTER);
+        this.footerPanel.add(Box.createHorizontalStrut(5), BorderLayout.WEST);
 
-	public JPanel getMainPanel() {
-		return this.mainPanel;
-	}
+        this.setLayout(new ContentPanelLayoutManager());
+        this.add(this.titlePanel);
+        this.add(this.mainPanel);
+        this.add(this.footerPanel);
 
-	public JPanel getFooterPanel() {
-		return this.footerPanel;
-	}
+        SubstanceCortex.ComponentScope.setDecorationType(this.titlePanel,
+                DecorationAreaType.PRIMARY_TITLE_PANE);
+        SubstanceCortex.ComponentScope.setDecorationType(this.footerPanel,
+                DecorationAreaType.FOOTER);
 
-	public JPanel getFooterContentPanel() {
-		return this.footerContentPanel;
-	}
+        this.mainPanelTopOffset = mainPanelTopOffset;
+    }
 
-	protected class ContentPanelLayoutManager implements LayoutManager {
-		@Override
-		public void addLayoutComponent(String name, Component comp) {
-		}
+    public JPanel getMainPanel() {
+        return this.mainPanel;
+    }
 
-		@Override
-		public void removeLayoutComponent(Component comp) {
-		}
+    public JPanel getFooterPanel() {
+        return this.footerPanel;
+    }
 
-		@Override
-		public Dimension minimumLayoutSize(Container parent) {
-			return this.preferredLayoutSize(parent);
-		}
+    public JPanel getTitlePanel() {
+        return this.titlePanel;
+    }
 
-		@Override
-		public Dimension preferredLayoutSize(Container parent) {
-			int w = Math.max(mainPanel.getPreferredSize().width,
-					footerContentPanel.getPreferredSize().width);
-			int h = mainPanel.getPreferredSize().height
-					+ footerPanel.getPreferredSize().height;
-			return new Dimension(w, h);
-		}
+    public JPanel getFooterContentPanel() {
+        return this.footerContentPanel;
+    }
 
-		@Override
-		public void layoutContainer(Container parent) {
-			Insets ins = parent.getInsets();
-			mainPanel
-					.setBounds(ins.left, ins.top, parent.getWidth() - ins.left
-							- ins.right, parent.getHeight() - ins.top
-							- ins.bottom - 32);
-			footerPanel.setBounds(ins.left, parent.getHeight() - ins.top
-					- ins.bottom - 32,
-					parent.getWidth() - ins.left - ins.right, 32);
-		}
-	}
+    protected class ContentPanelLayoutManager implements LayoutManager {
+        @Override
+        public void addLayoutComponent(String name, Component comp) {
+        }
+
+        @Override
+        public void removeLayoutComponent(Component comp) {
+        }
+
+        @Override
+        public Dimension minimumLayoutSize(Container parent) {
+            return this.preferredLayoutSize(parent);
+        }
+
+        @Override
+        public Dimension preferredLayoutSize(Container parent) {
+            int w = Math.max(mainPanel.getPreferredSize().width,
+                    footerContentPanel.getPreferredSize().width);
+            int h = titlePanel.getPreferredSize().height + mainPanel.getPreferredSize().height
+                    + footerPanel.getPreferredSize().height;
+            return new Dimension(w, h);
+        }
+
+        @Override
+        public void layoutContainer(Container parent) {
+            Insets ins = parent.getInsets();
+            int contentWidth = parent.getWidth() - ins.left - ins.right;
+            titlePanel.setBounds(ins.left, ins.top, parent.getWidth(),
+                    CookbookFrame.TITLE_PANE_PREF_HEIGHT);
+            mainPanel.setBounds(ins.left,
+                    ins.top + CookbookFrame.TITLE_PANE_PREF_HEIGHT + mainPanelTopOffset,
+                    contentWidth,
+                    parent.getHeight() - ins.top - ins.bottom
+                            - CookbookFrame.FOOTER_PANE_PREF_HEIGHT
+                            - CookbookFrame.TITLE_PANE_PREF_HEIGHT - mainPanelTopOffset);
+            footerPanel.setBounds(ins.left,
+                    parent.getHeight() - ins.top - ins.bottom
+                            - CookbookFrame.FOOTER_PANE_PREF_HEIGHT,
+                    contentWidth, CookbookFrame.FOOTER_PANE_PREF_HEIGHT);
+        }
+    }
 }

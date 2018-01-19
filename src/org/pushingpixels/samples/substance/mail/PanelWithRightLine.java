@@ -29,12 +29,16 @@
  */
 package org.pushingpixels.samples.substance.mail;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
 
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import org.pushingpixels.substance.api.SubstanceCortex;
 
 public class PanelWithRightLine extends JPanel {
     private Color rightLineColor;
@@ -50,12 +54,18 @@ public class PanelWithRightLine extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
+
         if (this.rightLineColor != null) {
             Graphics2D g2d = (Graphics2D) g.create();
             g2d.setColor(this.rightLineColor);
             int width = getWidth();
-            g2d.drawLine(width, 0, width, getHeight());
+
+            float borderStrokeWidth = 1.0f / (float) SubstanceCortex.GlobalScope.getScaleFactor();
+            g2d.setStroke(new BasicStroke(borderStrokeWidth));
+            Line2D.Float line = new Line2D.Float(width - borderStrokeWidth, 0,
+                    width - borderStrokeWidth, getHeight());
+            g2d.draw(line);
+            
             g2d.dispose();
         }
     }

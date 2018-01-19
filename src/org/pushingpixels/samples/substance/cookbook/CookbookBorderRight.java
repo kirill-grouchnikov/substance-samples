@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2010 Substance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2018 Substance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,9 +29,10 @@
  */
 package org.pushingpixels.samples.substance.cookbook;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -50,6 +51,18 @@ import org.pushingpixels.substance.api.colorscheme.SubstanceColorScheme;
  * @author Kirill Grouchnikov
  */
 public class CookbookBorderRight implements Border {
+    private float alphaTop;
+    private float alphaBottom;
+
+    public CookbookBorderRight() {
+        this(1.0f, 1.0f);
+    }
+
+    public CookbookBorderRight(float alphaTop, float alphaBottom) {
+        this.alphaTop = alphaTop;
+        this.alphaBottom = alphaBottom;
+    }
+
     @Override
     public Insets getBorderInsets(Component c) {
         return new Insets(0, 0, 0, 1);
@@ -72,13 +85,22 @@ public class CookbookBorderRight implements Border {
         Line2D.Float line = new Line2D.Float(x + width - borderStrokeWidth, y,
                 x + width - borderStrokeWidth, y + height);
 
-        g2d.setColor(scheme.getDarkColor());
-        g2d.draw(line);
-        g2d.setComposite(AlphaComposite.SrcOver.derive(0.8f));
-        g2d.setColor(scheme.getUltraDarkColor());
+        Color baseDarkColor = scheme.getDarkColor();
+        Color baseUltraDarkColor = scheme.getUltraDarkColor();
+        int baseRed = (int) (0.2f * baseDarkColor.getRed() + 0.8f * baseUltraDarkColor.getRed());
+        int baseGreen = (int) (0.2f * baseDarkColor.getGreen()
+                + 0.8f * baseUltraDarkColor.getGreen());
+        int baseBlue = (int) (0.2f * baseDarkColor.getBlue() + 0.8f * baseUltraDarkColor.getBlue());
+        int baseAlpha = (int) (0.2f * baseDarkColor.getAlpha()
+                + 0.8f * baseUltraDarkColor.getAlpha());
+
+        g2d.setPaint(new GradientPaint(x, y,
+                new Color(baseRed, baseGreen, baseBlue, (int) (baseAlpha * this.alphaTop)), x,
+                y + height,
+                new Color(baseRed, baseGreen, baseBlue, (int) (baseAlpha * this.alphaBottom))));
+
         g2d.draw(line);
 
         g2d.dispose();
     }
-
 }

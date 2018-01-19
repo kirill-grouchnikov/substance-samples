@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2010 Substance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2018 Substance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,31 +30,80 @@
 package org.pushingpixels.samples.substance.cookbook.panels;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.LayoutManager;
 
 import javax.swing.BoundedRangeModel;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import org.pushingpixels.flamingo.api.common.CommandToggleButtonGroup;
 import org.pushingpixels.flamingo.api.common.JCommandButton;
 import org.pushingpixels.flamingo.api.common.JCommandButtonStrip;
+import org.pushingpixels.flamingo.api.common.JCommandToggleButton;
 import org.pushingpixels.samples.substance.cookbook.EchoResizableIcon;
 import org.pushingpixels.samples.substance.cookbook.ScaledResizableIcon;
 import org.pushingpixels.samples.substance.cookbook.svg.ic_add_white_24px;
+import org.pushingpixels.samples.substance.cookbook.svg.ic_format_size_white_24px;
 import org.pushingpixels.samples.substance.cookbook.svg.ic_remove_white_24px;
+import org.pushingpixels.samples.substance.cookbook.svg.ic_view_headline_white_24px;
+import org.pushingpixels.samples.substance.cookbook.svg.ic_view_list_white_24px;
+import org.pushingpixels.samples.substance.cookbook.svg.ic_view_stream_white_24px;
 import org.pushingpixels.substance.api.SubstanceCortex;
 import org.pushingpixels.substance.api.SubstanceSlices.DecorationAreaType;
 
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+
 public class RecipeListPanel extends SingleContentPanel {
-    public RecipeListPanel() {
+    public RecipeListPanel(int mainPanelTopOffset) {
+        super(mainPanelTopOffset);
+
+        // Configure the title pane content
+        DefaultFormBuilder titlePaneBuilder = new DefaultFormBuilder(
+                new FormLayout("pref, 0dlu, 0dlu:grow, 0dlu, pref, 6dlu, pref", ""))
+                        .border(new EmptyBorder(8, 4, 0, 4));
+
+        JLabel smaller = new JLabel(new EchoResizableIcon(
+                new ScaledResizableIcon(ic_format_size_white_24px.of(16, 16), 0.6f)));
+        titlePaneBuilder.append(smaller);
+
+        JSlider slider = new JSlider(0, 100, 80);
+        titlePaneBuilder.append(slider);
+
+        JLabel bigger = new JLabel(new EchoResizableIcon(
+                new ScaledResizableIcon(ic_format_size_white_24px.of(16, 16), 0.8f)));
+        titlePaneBuilder.append(bigger);
+
+        JCommandButtonStrip titlePaneControlButtons = new JCommandButtonStrip();
+
+        JCommandToggleButton headlineView = new JCommandToggleButton("", new EchoResizableIcon(
+                new ScaledResizableIcon(ic_view_headline_white_24px.of(16, 16), 0.75f)));
+        JCommandToggleButton listView = new JCommandToggleButton("", new EchoResizableIcon(
+                new ScaledResizableIcon(ic_view_list_white_24px.of(16, 16), 0.75f)));
+        JCommandToggleButton streamView = new JCommandToggleButton("", new EchoResizableIcon(
+                new ScaledResizableIcon(ic_view_stream_white_24px.of(16, 16), 0.75f)));
+
+        titlePaneControlButtons.add(headlineView);
+        titlePaneControlButtons.add(listView);
+        titlePaneControlButtons.add(streamView);
+
+        CommandToggleButtonGroup group = new CommandToggleButtonGroup();
+        group.add(headlineView);
+        group.add(listView);
+        group.add(streamView);
+        group.setSelected(headlineView, true);
+
+        titlePaneBuilder.append(titlePaneControlButtons);
+
+        this.titlePanel.setLayout(new BorderLayout());
+        this.titlePanel.add(titlePaneBuilder.getPanel(), BorderLayout.CENTER);
+
         JPanel mainPanel = this.getMainPanel();
         JPanel recipePanel = new JPanel();
         JScrollPane scroll = new JScrollPane(recipePanel);
@@ -70,6 +119,10 @@ public class RecipeListPanel extends SingleContentPanel {
         // the contents
         scroll.getViewport().setScrollMode(JViewport.SIMPLE_SCROLL_MODE);
 
+        // Footer content
+        DefaultFormBuilder footerPaneBuilder = new DefaultFormBuilder(
+                new FormLayout("pref, 12dlu, 0dlu:grow", "")).border(new EmptyBorder(6, 0, 4, 0));
+
         final JCommandButtonStrip controlButtons = new JCommandButtonStrip();
 
         JCommandButton addButton = new JCommandButton("", new EchoResizableIcon(
@@ -84,62 +137,16 @@ public class RecipeListPanel extends SingleContentPanel {
         // has white background
         SubstanceCortex.ComponentScope.setDecorationType(searchTextField, DecorationAreaType.NONE);
 
-        LayoutManager layout = new LayoutManager() {
-            @Override
-            public void addLayoutComponent(String name, Component comp) {
-            }
+        footerPaneBuilder.append(controlButtons);
+        footerPaneBuilder.append(searchTextField);
 
-            @Override
-            public void removeLayoutComponent(Component comp) {
-            }
+        this.getFooterContentPanel().add(footerPaneBuilder.build());
 
-            @Override
-            public Dimension minimumLayoutSize(Container parent) {
-                return this.preferredLayoutSize(parent);
-            }
-
-            @Override
-            public Dimension preferredLayoutSize(Container parent) {
-                int width = controlButtons.getPreferredSize().width
-                        + searchTextField.getPreferredSize().width;
-                return new Dimension(width + 20, controlButtons.getPreferredSize().height);
-            }
-
-            @Override
-            public void layoutContainer(Container parent) {
-                Insets ins = parent.getInsets();
-
-                Dimension prefButtons = controlButtons.getPreferredSize();
-                Dimension prefText = searchTextField.getPreferredSize();
-
-                int availableHeight = parent.getHeight() - ins.top - ins.bottom;
-                controlButtons.setBounds(ins.left,
-                        ins.top + (availableHeight - prefButtons.height) / 2, prefButtons.width,
-                        prefButtons.height);
-
-                searchTextField.setBounds(parent.getWidth() - ins.left - ins.right - prefText.width,
-                        ins.top + (availableHeight - prefText.height) / 2, prefText.width,
-                        prefText.height);
-            }
-        };
-
-        JPanel panel = new JPanel(layout);
-        panel.add(controlButtons);
-        panel.add(searchTextField);
-
-        JPanel statusBar = this.getFooterContentPanel();
-        statusBar.add(panel);
-
-        // scroll down. The preferred sizes are here to
+        // Scroll down. The preferred sizes are here to
         // make the scroll thumb appear
         recipePanel.setPreferredSize(new Dimension(280, 1800));
         scroll.setPreferredSize(new Dimension(280, 300));
         final BoundedRangeModel verticalScrollModel = scroll.getVerticalScrollBar().getModel();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                verticalScrollModel.setValue(800);
-            }
-        });
+        SwingUtilities.invokeLater(() -> verticalScrollModel.setValue(800));
     }
 }

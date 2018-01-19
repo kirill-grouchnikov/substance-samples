@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2010 Substance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2018 Substance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@ package org.pushingpixels.samples.substance.cookbook.panels;
 
 import java.awt.Dimension;
 
-import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import org.pushingpixels.flamingo.api.common.JCommandButton;
 import org.pushingpixels.flamingo.api.common.JCommandButton.CommandButtonKind;
@@ -42,8 +42,16 @@ import org.pushingpixels.samples.substance.cookbook.svg.ic_add_white_24px;
 import org.pushingpixels.samples.substance.cookbook.svg.ic_remove_white_24px;
 import org.pushingpixels.samples.substance.cookbook.svg.ic_settings_white_24px;
 
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+
 public class CategoryListPanel extends SingleContentPanel {
-    public CategoryListPanel() {
+    public CategoryListPanel(int mainPanelTopOffset) {
+        super(mainPanelTopOffset);
+
+        DefaultFormBuilder footerPaneBuilder = new DefaultFormBuilder(new FormLayout("pref", ""))
+                .border(new EmptyBorder(6, 0, 4, 0));
+
         JCommandButtonStrip controlButtons = new JCommandButtonStrip();
 
         JCommandButton addButton = new JCommandButton("", new EchoResizableIcon(
@@ -57,8 +65,9 @@ public class CategoryListPanel extends SingleContentPanel {
         controlButtons.add(removeButton);
         controlButtons.add(confButton);
 
-        JPanel statusBar = this.getFooterContentPanel();
-        statusBar.add(controlButtons);
+        footerPaneBuilder.append(controlButtons);
+        
+        this.getFooterContentPanel().add(footerPaneBuilder.build());
     }
 
     @Override

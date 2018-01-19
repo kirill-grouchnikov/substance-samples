@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2010 Substance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2018 Substance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,9 @@ package org.pushingpixels.samples.substance.cookbook;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -45,42 +47,63 @@ import org.pushingpixels.substance.api.SubstanceSlices.ColorSchemeAssociationKin
 import org.pushingpixels.substance.api.colorscheme.SubstanceColorScheme;
 
 /**
- * Custom border to provide separation lines between the main application
- * panels.
+ * Custom border to provide separation lines between the main application panels.
  * 
  * @author Kirill Grouchnikov
  */
 public class CookbookBorderLeft implements Border {
-	@Override
-	public Insets getBorderInsets(Component c) {
-		return new Insets(0, 1, 0, 0);
-	}
+    private float alphaTop;
+    private float alphaBottom;
+    private boolean skipTopPixel;
+    private boolean skipBottomPixel;
 
-	@Override
-	public boolean isBorderOpaque() {
-		return false;
-	}
+    public CookbookBorderLeft(boolean skipTopPixel, boolean skipBottomPixel) {
+        this(skipTopPixel, skipBottomPixel, 1.0f, 1.0f);
+    }
 
-	@Override
-	public void paintBorder(Component c, Graphics g, int x, int y, int width,
-			int height) {
-		SubstanceColorScheme scheme = SubstanceCortex.ComponentScope.getCurrentSkin(c)
-				.getColorScheme(c, ColorSchemeAssociationKind.BORDER,
-						ComponentState.ENABLED);
+    public CookbookBorderLeft(boolean skipTopPixel, boolean skipBottomPixel, float alphaTop,
+            float alphaBottom) {
+        this.skipTopPixel = skipTopPixel;
+        this.skipBottomPixel = skipBottomPixel;
+        this.alphaTop = alphaTop;
+        this.alphaBottom = alphaBottom;
+    }
 
-		Graphics2D g2d = (Graphics2D) g.create();
+    @Override
+    public Insets getBorderInsets(Component c) {
+        return new Insets(0, 1, 0, 0);
+    }
 
-		// light line on the left-hand side
-		g2d.setComposite(AlphaComposite.SrcOver);
-		g2d.setColor(scheme.getLightColor());
-		// start one pixel lower so that the top border painted by the
-		// decoration painter on footers doesn't get overriden
+    @Override
+    public boolean isBorderOpaque() {
+        return false;
+    }
+
+    @Override
+    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+        SubstanceColorScheme scheme = SubstanceCortex.ComponentScope.getCurrentSkin(c)
+                .getColorScheme(c, ColorSchemeAssociationKind.BORDER, ComponentState.ENABLED);
+
+        Graphics2D g2d = (Graphics2D) g.create();
+
+        // light line on the left-hand side
+        g2d.setComposite(AlphaComposite.SrcOver);
+        Color baseColor = scheme.getLightColor();
+        g2d.setPaint(new GradientPaint(x, y,
+                new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(),
+                        (int) (baseColor.getAlpha() * this.alphaTop)),
+                x, y + height, new Color(baseColor.getRed(), baseColor.getGreen(),
+                        baseColor.getBlue(), (int) (baseColor.getAlpha() * this.alphaBottom))));
+        // start one pixel lower so that the top border painted by the
+        // decoration painter on footers doesn't get overriden
         float borderStrokeWidth = 1.0f / (float) SubstanceCortex.GlobalScope.getScaleFactor();
         g2d.setStroke(new BasicStroke(borderStrokeWidth));
-        Line2D.Float line = new Line2D.Float(x, y + borderStrokeWidth, x, y + height - borderStrokeWidth);
+        float topY = y + (skipTopPixel ? borderStrokeWidth : 0);
+        float bottomY = y + height - borderStrokeWidth - (skipBottomPixel ? borderStrokeWidth : 0);
+        Line2D.Float line = new Line2D.Float(x, topY, x, bottomY);
         g2d.draw(line);
 
-		g2d.dispose();
-	}
+        g2d.dispose();
+    }
 
 }

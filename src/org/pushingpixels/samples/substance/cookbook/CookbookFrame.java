@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2010 Substance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2018 Substance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,25 +29,19 @@
  */
 package org.pushingpixels.samples.substance.cookbook;
 
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.LinearGradientPaint;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.LayoutManager2;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
 
 import org.pushingpixels.samples.substance.cookbook.panels.CategoryListPanel;
-import org.pushingpixels.samples.substance.cookbook.panels.CookbookToolBar;
+import org.pushingpixels.samples.substance.cookbook.panels.LightsHolderPanel;
 import org.pushingpixels.samples.substance.cookbook.panels.RecipeListPanel;
+import org.pushingpixels.samples.substance.cookbook.panels.RecipePanel;
 import org.pushingpixels.samples.substance.cookbook.panels.SingleContentPanel;
 import org.pushingpixels.samples.substance.cookbook.skin.CookbookSkin;
 import org.pushingpixels.substance.api.SubstanceCortex;
@@ -57,72 +51,115 @@ import org.pushingpixels.substance.api.SubstanceSlices.FocusKind;
 import org.pushingpixels.substance.flamingo.SubstanceFlamingoPlugin;
 
 public class CookbookFrame extends JFrame {
+    public static final int TITLE_PANE_PREF_HEIGHT = 40;
+    public static final int FOOTER_PANE_PREF_HEIGHT = 36;
+
+    private SingleContentPanel firstPanel;
+    private SingleContentPanel secondPanel;
+    private SingleContentPanel thirdPanel;
+    private LightsHolderPanel lightsHolderPanel;
+
     public CookbookFrame() {
         super("Cookbook");
 
-        JPanel selectionPanel = new JPanel(new BorderLayout());
-        JPanel subSelectionPanel = new JPanel(new BorderLayout());
+        lightsHolderPanel = new LightsHolderPanel();
 
-        SingleContentPanel categoryListPanel = new CategoryListPanel();
-        SingleContentPanel recipeListPanel = new RecipeListPanel();
+        int mainPanelTopOffset = this.lightsHolderPanel.getPreferredSize().height;
 
-        subSelectionPanel.add(categoryListPanel, BorderLayout.WEST);
-        subSelectionPanel.add(recipeListPanel, BorderLayout.CENTER);
-        // add the special component that simulates light holders
-        selectionPanel.add(new JComponent() {
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(10, 5);
-            }
+        firstPanel = new CategoryListPanel(mainPanelTopOffset);
+        secondPanel = new RecipeListPanel(mainPanelTopOffset);
+        thirdPanel = new RecipePanel(0);
 
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g.create();
-                float borderStrokeWidth = 1.0f
-                        / (float) SubstanceCortex.GlobalScope.getScaleFactor();
-                g2d.setStroke(new BasicStroke(borderStrokeWidth));
-
-                LinearGradientPaint lgp = new LinearGradientPaint(0, 0, getWidth(), 0,
-                        new float[] { 0.0f, 0.5f, 1.0f }, new Color[] { new Color(228, 228, 228),
-                                        new Color(144, 144, 144), new Color(228, 228, 228) });
-                g2d.setPaint(lgp);
-                g2d.fillRect(0, 0, getWidth(), getHeight());
-                g2d.setColor(Color.black);
-                g2d.draw(new Rectangle2D.Float(0, 0, getWidth() - borderStrokeWidth,
-                        getHeight() - borderStrokeWidth));
-
-                LinearGradientPaint lgp2 = new LinearGradientPaint(0, 0, getWidth(), 0,
-                        new float[] { 0.0f, 0.2f, 0.7f, 1.0f },
-                        new Color[] { new Color(196, 196, 196), new Color(16, 16, 16),
-                                        new Color(32, 32, 32), new Color(228, 228, 228) });
-                g2d.setPaint(lgp2);
-                g2d.draw(new Line2D.Float(borderStrokeWidth, getHeight() - borderStrokeWidth,
-                        getWidth() - 2 * borderStrokeWidth, getHeight() - borderStrokeWidth));
-
-                g2d.dispose();
-            }
-        }, BorderLayout.NORTH);
-
-        // mark the entire selection panel as GENERAL so that we have
-        // continuous lights on the top
-        SubstanceCortex.ComponentScope.setDecorationType(subSelectionPanel,
+        // mark the main panels of first/second panels as GENERAL so that we have
+        // continuous lights right below the lights holder panel
+        SubstanceCortex.ComponentScope.setDecorationType(firstPanel.getMainPanel(),
                 DecorationAreaType.GENERAL);
-        selectionPanel.add(subSelectionPanel, BorderLayout.CENTER);
-
-        SingleContentPanel recipePanel = new SingleContentPanel();
+        SubstanceCortex.ComponentScope.setDecorationType(secondPanel.getMainPanel(),
+                DecorationAreaType.GENERAL);
 
         // configure borders
-        categoryListPanel.getMainPanel().setBorder(new CookbookBorderRight());
-        categoryListPanel.getFooterPanel().setBorder(new CookbookBorderRight());
-        recipeListPanel.getMainPanel().setBorder(new CookbookBorderLeft());
-        recipeListPanel.getFooterPanel()
-                .setBorder(new CompoundBorder(new CookbookBorderLeft(), new CookbookBorderRight()));
-        recipePanel.getFooterPanel().setBorder(new CookbookBorderLeft());
+        firstPanel.getTitlePanel().setBorder(new CookbookBorderRight(0.0f, 1.0f));
+        firstPanel.getMainPanel().setBorder(new CookbookBorderRight());
+        firstPanel.getFooterPanel().setBorder(new CookbookBorderRight());
+        secondPanel.getTitlePanel()
+                .setBorder(new CompoundBorder(new CookbookBorderLeft(false, true, 0.0f, 1.0f),
+                        new CookbookBorderRight(0.0f, 1.0f)));
+        secondPanel.getMainPanel().setBorder(new CookbookBorderLeft(true, false));
+        secondPanel.getFooterPanel().setBorder(
+                new CompoundBorder(new CookbookBorderLeft(true, false), new CookbookBorderRight()));
+        thirdPanel.getTitlePanel().setBorder(new CookbookBorderLeft(false, true, 0.0f, 1.0f));
+        thirdPanel.getFooterPanel().setBorder(new CookbookBorderLeft(true, false));
 
-        this.add(selectionPanel, BorderLayout.WEST);
-        this.add(recipePanel, BorderLayout.CENTER);
+        Container contentPane = this.getContentPane();
 
-        this.add(new CookbookToolBar(), BorderLayout.NORTH);
+        contentPane.add(lightsHolderPanel);
+        contentPane.add(firstPanel);
+        contentPane.add(secondPanel);
+        contentPane.add(thirdPanel);
+
+        contentPane.setComponentZOrder(lightsHolderPanel, 0);
+
+        // this.add(new CookbookToolBar(), BorderLayout.NORTH);
+
+        contentPane.setLayout(new LayoutManager2() {
+            @Override
+            public void addLayoutComponent(String name, Component comp) {
+            }
+
+            @Override
+            public void addLayoutComponent(Component comp, Object constraints) {
+            }
+
+            @Override
+            public void removeLayoutComponent(Component comp) {
+            }
+
+            @Override
+            public float getLayoutAlignmentY(Container target) {
+                return 0;
+            }
+
+            @Override
+            public float getLayoutAlignmentX(Container target) {
+                return 0;
+            }
+
+            @Override
+            public Dimension preferredLayoutSize(Container parent) {
+                return null;
+            }
+
+            @Override
+            public Dimension minimumLayoutSize(Container parent) {
+                return preferredLayoutSize(parent);
+            }
+
+            @Override
+            public Dimension maximumLayoutSize(Container target) {
+                return preferredLayoutSize(target);
+            }
+
+            @Override
+            public void invalidateLayout(Container target) {
+            }
+
+            @Override
+            public void layoutContainer(Container parent) {
+                int width = parent.getWidth();
+                int height = parent.getHeight();
+
+                Dimension firstPref = firstPanel.getPreferredSize();
+                Dimension secondPref = secondPanel.getPreferredSize();
+
+                firstPanel.setBounds(0, 0, firstPref.width, height);
+                secondPanel.setBounds(firstPref.width, 0, secondPref.width, height);
+                thirdPanel.setBounds(firstPref.width + secondPref.width, 0,
+                        width - firstPref.width - secondPref.width, height);
+                lightsHolderPanel.setBounds(0, TITLE_PANE_PREF_HEIGHT,
+                        firstPref.width + secondPref.width,
+                        lightsHolderPanel.getPreferredSize().height);
+            }
+        });
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(960, 536);
@@ -139,7 +176,13 @@ public class CookbookFrame extends JFrame {
                     SubstanceSlices.HorizontalGravity.CENTERED,
                     SubstanceSlices.HorizontalGravity.SWING_DEFAULT,
                     SubstanceSlices.TitleIconHorizontalGravity.NONE);
-            new CookbookFrame().setVisible(true);
+
+            JFrame frame = new CookbookFrame();
+            SubstanceCortex.WindowScope.extendContentIntoTitlePane(frame,
+                    SubstanceSlices.HorizontalGravity.LEADING,
+                    SubstanceSlices.VerticalGravity.CENTERED);
+            SubstanceCortex.WindowScope.setPreferredTitlePaneHeight(frame, TITLE_PANE_PREF_HEIGHT);
+            frame.setVisible(true);
         });
     }
 }
