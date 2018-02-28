@@ -37,7 +37,6 @@ import org.pushingpixels.substance.api.SubstanceSkin;
 import org.pushingpixels.substance.api.SubstanceSlices.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.SubstanceSlices.DecorationAreaType;
 import org.pushingpixels.substance.api.colorscheme.ColorSchemeSingleColorQuery;
-import org.pushingpixels.substance.api.colorscheme.ColorSchemeTransform;
 import org.pushingpixels.substance.api.colorscheme.CremeColorScheme;
 import org.pushingpixels.substance.api.colorscheme.LightGrayColorScheme;
 import org.pushingpixels.substance.api.colorscheme.SubstanceColorScheme;
@@ -109,12 +108,8 @@ public class CookbookSkin extends SubstanceSkin {
                                 ColorSchemeSingleColorQuery.ULTRADARK });
         SubstanceBorderPainter innerBorderPainter = new DelegateBorderPainter("Cookbook Inner",
                 new ClassicBorderPainter(), 0x88FFFFFF, 0x44FFFFFF, 0x00FFFFFF,
-                new ColorSchemeTransform() {
-                    @Override
-                    public SubstanceColorScheme transform(SubstanceColorScheme scheme) {
-                        return scheme.shiftBackground(scheme.getUltraLightColor(), 0.8).tint(0.7);
-                    }
-                });
+                (SubstanceColorScheme scheme) -> scheme
+                        .shiftBackground(scheme.getUltraLightColor(), 0.8).tint(0.7));
         this.borderPainter = new CompositeBorderPainter("Cookbook", outerBorderPainter,
                 innerBorderPainter);
 
