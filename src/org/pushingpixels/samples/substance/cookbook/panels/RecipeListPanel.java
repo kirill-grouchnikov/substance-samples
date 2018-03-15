@@ -54,7 +54,7 @@ import org.pushingpixels.samples.substance.cookbook.svg.ic_remove_white_24px;
 import org.pushingpixels.samples.substance.cookbook.svg.ic_view_headline_white_24px;
 import org.pushingpixels.samples.substance.cookbook.svg.ic_view_list_white_24px;
 import org.pushingpixels.samples.substance.cookbook.svg.ic_view_stream_white_24px;
-import org.pushingpixels.substance.api.SubstanceCortex;
+import org.pushingpixels.substance.api.SubstanceCortex.ComponentOrParentChainScope;
 import org.pushingpixels.substance.api.SubstanceSlices.DecorationAreaType;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -135,7 +135,7 @@ public class RecipeListPanel extends SingleContentPanel {
         final JTextField searchTextField = new JTextField(15);
         // mark the search text field with NONE decoration so that it
         // has white background
-        SubstanceCortex.ComponentScope.setDecorationType(searchTextField, DecorationAreaType.NONE);
+        ComponentOrParentChainScope.setDecorationType(searchTextField, DecorationAreaType.NONE);
 
         footerPaneBuilder.append(controlButtons);
         footerPaneBuilder.append(searchTextField);

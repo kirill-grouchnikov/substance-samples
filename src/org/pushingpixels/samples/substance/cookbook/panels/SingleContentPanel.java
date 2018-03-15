@@ -40,7 +40,7 @@ import javax.swing.Box;
 import javax.swing.JPanel;
 
 import org.pushingpixels.samples.substance.cookbook.CookbookFrame;
-import org.pushingpixels.substance.api.SubstanceCortex;
+import org.pushingpixels.substance.api.SubstanceCortex.ComponentOrParentChainScope;
 import org.pushingpixels.substance.api.SubstanceSlices.DecorationAreaType;
 
 /**
@@ -75,9 +75,9 @@ public class SingleContentPanel extends JPanel {
         this.add(this.mainPanel);
         this.add(this.footerPanel);
 
-        SubstanceCortex.ComponentScope.setDecorationType(this.titlePanel,
+        ComponentOrParentChainScope.setDecorationType(this.titlePanel,
                 DecorationAreaType.PRIMARY_TITLE_PANE);
-        SubstanceCortex.ComponentScope.setDecorationType(this.footerPanel,
+        ComponentOrParentChainScope.setDecorationType(this.footerPanel,
                 DecorationAreaType.FOOTER);
 
         this.mainPanelTopOffset = mainPanelTopOffset;

@@ -45,6 +45,7 @@ import org.pushingpixels.samples.substance.cookbook.panels.RecipePanel;
 import org.pushingpixels.samples.substance.cookbook.panels.SingleContentPanel;
 import org.pushingpixels.samples.substance.cookbook.skin.CookbookSkin;
 import org.pushingpixels.substance.api.SubstanceCortex;
+import org.pushingpixels.substance.api.SubstanceCortex.ComponentOrParentChainScope;
 import org.pushingpixels.substance.api.SubstanceSlices;
 import org.pushingpixels.substance.api.SubstanceSlices.DecorationAreaType;
 import org.pushingpixels.substance.api.SubstanceSlices.FocusKind;
@@ -72,9 +73,9 @@ public class CookbookFrame extends JFrame {
 
         // mark the main panels of first/second panels as GENERAL so that we have
         // continuous lights right below the lights holder panel
-        SubstanceCortex.ComponentScope.setDecorationType(firstPanel.getMainPanel(),
+        ComponentOrParentChainScope.setDecorationType(firstPanel.getMainPanel(),
                 DecorationAreaType.GENERAL);
-        SubstanceCortex.ComponentScope.setDecorationType(secondPanel.getMainPanel(),
+        ComponentOrParentChainScope.setDecorationType(secondPanel.getMainPanel(),
                 DecorationAreaType.GENERAL);
 
         // configure borders

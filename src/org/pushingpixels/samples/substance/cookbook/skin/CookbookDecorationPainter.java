@@ -48,6 +48,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.SwingUtilities;
 
 import org.pushingpixels.substance.api.SubstanceCortex;
+import org.pushingpixels.substance.api.SubstanceCortex.ComponentOrParentChainScope;
 import org.pushingpixels.substance.api.SubstanceSkin;
 import org.pushingpixels.substance.api.SubstanceSlices.DecorationAreaType;
 import org.pushingpixels.substance.api.colorscheme.SubstanceColorScheme;
@@ -200,7 +201,7 @@ class CookbookDecorationPainter implements SubstanceDecorationPainter {
             comp = comp.getParent();
             if (comp == null)
                 break;
-            DecorationAreaType curr = SubstanceCortex.ComponentScope.getDecorationType(comp);
+            DecorationAreaType curr = ComponentOrParentChainScope.getDecorationType(comp);
             if (curr == type) {
                 result = comp;
             }

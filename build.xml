@@ -56,9 +56,9 @@
     <property name="substance.demo.basedir" value="${module.substance-samples.basedir}/../substance-demo" />
     <property name="trident.basedir" value="${module.substance-samples.basedir}/../trident" />
 
-    <property name="substance.version" value="8.0.00-rc" />
-    <property name="flamingo.version" value="5.3.00-rc" />
-    <property name="trident.version" value="1.5.00-rc" />
+    <property name="substance.version" value="8.0.00" />
+    <property name="flamingo.version" value="5.3.00" />
+    <property name="trident.version" value="1.5.00" />
 
 	<path id="substance-samples.module.bootclasspath">
 		<!-- Paths to be included in compilation bootclasspath -->

@@ -40,6 +40,7 @@ import javax.swing.JScrollBar;
 
 import org.pushingpixels.flamingo.api.common.AbstractCommandButton;
 import org.pushingpixels.substance.api.SubstanceCortex;
+import org.pushingpixels.substance.api.SubstanceCortex.ComponentOrParentChainScope;
 import org.pushingpixels.substance.api.SubstanceSlices.DecorationAreaType;
 import org.pushingpixels.substance.api.colorscheme.ColorSchemeSingleColorQuery;
 import org.pushingpixels.substance.api.colorscheme.SubstanceColorScheme;
@@ -83,7 +84,7 @@ public class CookbookGradientPainter implements SubstanceFillPainter {
             AbstractCommandButton commandButton = (AbstractCommandButton) comp;
             if (!commandButton.getActionModel().isSelected()
                     && !commandButton.getActionModel().isPressed()) {
-                DecorationAreaType decorationAreaType = SubstanceCortex.ComponentScope
+                DecorationAreaType decorationAreaType = ComponentOrParentChainScope
                         .getDecorationType(comp);
                 SubstanceDecorationPainter decoPainter = SubstanceCortex.ComponentScope
                         .getCurrentSkin(comp).getDecorationPainter();

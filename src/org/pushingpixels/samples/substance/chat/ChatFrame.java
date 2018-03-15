@@ -44,6 +44,7 @@ import org.pushingpixels.samples.substance.chat.svg.ic_chat_black_24px;
 import org.pushingpixels.samples.substance.chat.svg.ic_help_outline_black_24px;
 import org.pushingpixels.samples.substance.chat.svg.ic_person_black_24px;
 import org.pushingpixels.substance.api.SubstanceCortex;
+import org.pushingpixels.substance.api.SubstanceCortex.ComponentOrParentChainScope;
 import org.pushingpixels.substance.api.SubstanceSlices;
 import org.pushingpixels.substance.api.SubstanceSlices.DecorationAreaType;
 import org.pushingpixels.substance.api.SubstanceSlices.FocusKind;
@@ -82,7 +83,7 @@ public class ChatFrame extends JFrame {
         JPanel titlePane = titlePaneBuilder.build();
         titlePane.setPreferredSize(new Dimension(100, 40));
         titlePane.setOpaque(true);
-        SubstanceCortex.ComponentScope.setDecorationType(titlePane,
+        ComponentOrParentChainScope.setDecorationType(titlePane,
                 DecorationAreaType.PRIMARY_TITLE_PANE);
 
         this.getContentPane().add(titlePane, BorderLayout.NORTH);

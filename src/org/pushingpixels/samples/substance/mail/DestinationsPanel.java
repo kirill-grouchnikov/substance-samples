@@ -52,6 +52,7 @@ import org.pushingpixels.samples.substance.mail.svg.ic_star_border_black_24px;
 import org.pushingpixels.samples.substance.mail.svg.ic_watch_later_black_24px;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.SubstanceCortex;
+import org.pushingpixels.substance.api.SubstanceCortex.ComponentOrParentChainScope;
 import org.pushingpixels.substance.api.SubstanceSkin;
 import org.pushingpixels.substance.api.SubstanceSlices.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.SubstanceSlices.DecorationAreaType;
@@ -73,7 +74,7 @@ public class DestinationsPanel extends PanelWithRightLine {
     public DestinationsPanel(Window window) {
         SubstanceSkin currentSkin = SubstanceCortex.GlobalScope.getCurrentSkin();
 
-        SubstanceCortex.ComponentScope.setDecorationType(this, DecorationAreaType.GENERAL);
+        ComponentOrParentChainScope.setDecorationType(this, DecorationAreaType.GENERAL);
         this.setRightLineColor(currentSkin.getColorScheme(DecorationAreaType.GENERAL,
                 ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getDarkColor());
         this.setLayout(new VerticalStackLayout());
